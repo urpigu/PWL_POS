@@ -4,24 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\UserModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
     public function index()
     {
-        // tambah data user dengan Eloquent Model
-        $data = [
-            'level_id' => 2,
-            'username' => 'manager_tiga',
-            'nama' => 'Manager 3',
-            'password' => Hash::make('12345'),
-        ];
+        // Menemukan data user berdasarkan id = 20 dan hanya memilih kolom 'username' dan 'nama'
+        $user = UserModel::findOr(20, ['username', 'nama'], function () {
+            abort(404); // Jika data tidak ditemukan, tampilkan error 404
+        });
 
-        UserModel::create($data); // menambah data user baru
-
-        // coba akses model UserModel
-        $user = UserModel::all(); // ambil semua data dari tabel m_user
-        return view('user', ['data' => $user]);
+        return view('user', ['data' => $user]); // Mengirim data user ke view
     }
 }
