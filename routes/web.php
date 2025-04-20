@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\LevelController;
+
 
 // Halaman Home
 Route::get('/', function () {
@@ -23,3 +25,6 @@ Route::get('user/{id}/name/{name}', [UserController::class, 'show']);
 
 // Halaman Penjualan
 Route::get('penjualan', [TransactionController::class, 'index']);
+
+// Level
+Route::get('/level', [LevelController::class, 'index']);
