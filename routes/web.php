@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\LevelController;
+use App\Http\Controllers\KategoriController;
 
 
 // Halaman Home
@@ -28,3 +29,6 @@ Route::get('penjualan', [TransactionController::class, 'index']);
 
 // Level
 Route::get('/level', [LevelController::class, 'index']);
+
+// Kategori
+Route::get('/kategori', [KategoriController::class, 'index']);
