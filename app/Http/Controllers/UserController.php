@@ -9,10 +9,8 @@ class UserController extends Controller
 {
     public function index()
     {
-        // Menemukan data user berdasarkan id = 20 dan hanya memilih kolom 'username' dan 'nama'
-        $user = UserModel::findOr(20, ['username', 'nama'], function () {
-            abort(404); // Jika data tidak ditemukan, tampilkan error 404
-        });
+        // Menemukan data user berdasarkan username = 'manager9'
+        $user = UserModel::where('username', 'manager9')->firstOrFail(); // Mengambil user dengan username 'manager9' dan jika tidak ditemukan akan menampilkan error 404
 
         return view('user', ['data' => $user]); // Mengirim data user ke view
     }
