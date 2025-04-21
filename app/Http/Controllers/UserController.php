@@ -8,47 +8,65 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    // Tampil daftar user
     public function index()
     {
-        // Cari user dengan username 'manager55', buat baru jika belum ada
-        $user = UserModel::firstOrCreate(
-            ['username' => 'manager55'],
-            [
-                'nama' => 'Manager55',
-                'password' => Hash::make('12345'),
-                'level_id' => 2,
-            ]
-        );
+        $user = UserModel::all();
+        return view('user', ['data' => $user]);
+    }
 
-        $newUsername = 'manager57';
+    // Tampil form tambah user
+    public function tambah()
+    {
+        return view('user_tambah');
+    }
 
-        // Cek apakah username baru sudah dipakai oleh user lain selain user ini
-        $exists = UserModel::where('username', $newUsername)
-            ->where('user_id', '!=', $user->user_id)
-            ->exists();
+    // Proses simpan data user baru
+    public function tambah_simpan(Request $request)
+    {
+        UserModel::create([
+            'username' => $request->username,
+            'nama' => $request->nama,
+            'password' => Hash::make($request->password),
+            'level_id' => $request->level_id,
+        ]);
 
-        if (!$exists) {
-            // Update username jika berbeda
-            $user->username = $newUsername;
+        return redirect('/user');
+    }
 
-            // Simpan jika ada perubahan
-            if ($user->isDirty()) {
-                $user->save();
-            }
+    // Tampil form ubah data user (GET)
+    public function ubah($id)
+    {
+        $user = UserModel::find($id);
+        return view('user_ubah', ['data' => $user]);
+    }
 
-            // Cek apakah atribut 'nama' atau 'username' berubah setelah save
-            // (hasilnya false jika tidak ada perubahan yang baru saja disimpan)
-            $changed = $user->wasChanged(['nama', 'username']);
+    // Proses simpan update data user (PUT)
+    public function ubah_simpan(Request $request, $id)
+    {
+        $user = UserModel::find($id);
+        $user->username = $request->username;
+        $user->nama = $request->nama;
 
-            // Tampilkan hasil pengecekan perubahan tersebut untuk debugging
-            dd($changed); // true / false
-
-            // Jika ingin lanjut, return view
-            // return view('user', ['data' => $user]);
-
-        } else {
-            // Username sudah dipakai user lain, beri informasi
-            return "Username '{$newUsername}' sudah digunakan, silakan pilih username lain.";
+        // Jika password diisi, hash dan update
+        if (!empty($request->password)) {
+            $user->password = Hash::make($request->password);
         }
+
+        $user->level_id = $request->level_id;
+        $user->save();
+
+        return redirect('/user');
+    }
+
+    // Proses hapus user
+    public function hapus($id)
+    {
+        $user = UserModel::find($id);
+        if ($user) {
+            $user->delete();
+        }
+
+        return redirect('/user');
     }
 }

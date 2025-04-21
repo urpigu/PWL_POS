@@ -20,17 +20,28 @@ Route::prefix('category')->group(function () {
     Route::get('baby-kid', [ProductController::class, 'babyKid']);
 });
 
-// Halaman User
+// Halaman User dengan parameter dinamis
 Route::get('user/{id}/name/{name}', [UserController::class, 'show']);
 
 // Halaman Penjualan
 Route::get('penjualan', [TransactionController::class, 'index']);
 
-// Level
+// Halaman Level
 Route::get('/level', [LevelController::class, 'index']);
 
-// Kategori
+// Halaman Kategori
 Route::get('/kategori', [KategoriController::class, 'index']);
 
-// User
+// User Routes
 Route::get('/user', [UserController::class, 'index']);
+Route::get('/user/tambah', [UserController::class, 'tambah']);
+Route::post('/user/tambah_simpan', [UserController::class, 'tambah_simpan']);
+
+// Route untuk menampilkan form ubah (GET)
+Route::get('/user/ubah/{id}', [UserController::class, 'ubah']);
+
+// Route untuk proses update user (PUT)
+Route::put('/user/ubah_simpan/{id}', [UserController::class, 'ubah_simpan']);
+
+// Route untuk hapus user (sesuai instruksi)
+Route::get('/user/hapus/{id}', [UserController::class, 'hapus']);
