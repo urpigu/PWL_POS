@@ -8,20 +8,18 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    // Tampil daftar user
+    // Method index baru dengan eager loading relasi level
     public function index()
     {
-        $user = UserModel::all();
+        $user = UserModel::with('level')->get();
         return view('user', ['data' => $user]);
     }
 
-    // Tampil form tambah user
     public function tambah()
     {
         return view('user_tambah');
     }
 
-    // Proses simpan data user baru
     public function tambah_simpan(Request $request)
     {
         UserModel::create([
@@ -34,21 +32,18 @@ class UserController extends Controller
         return redirect('/user');
     }
 
-    // Tampil form ubah data user (GET)
     public function ubah($id)
     {
         $user = UserModel::find($id);
         return view('user_ubah', ['data' => $user]);
     }
 
-    // Proses simpan update data user (PUT)
     public function ubah_simpan(Request $request, $id)
     {
         $user = UserModel::find($id);
         $user->username = $request->username;
         $user->nama = $request->nama;
 
-        // Jika password diisi, hash dan update
         if (!empty($request->password)) {
             $user->password = Hash::make($request->password);
         }
@@ -59,7 +54,6 @@ class UserController extends Controller
         return redirect('/user');
     }
 
-    // Proses hapus user
     public function hapus($id)
     {
         $user = UserModel::find($id);
