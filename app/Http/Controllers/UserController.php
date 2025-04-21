@@ -10,6 +10,7 @@ class UserController extends Controller
 {
     public function index()
     {
+        // Cari user dengan username 'manager33', jika tidak ada buat baru dengan data berikut
         $user = UserModel::firstOrNew(
             ['username' => 'manager33'],
             [
@@ -19,8 +20,10 @@ class UserController extends Controller
             ]
         );
 
+        // Simpan user jika baru dibuat
         $user->save();
 
+        // Kirim data user ke view 'user'
         return view('user', ['data' => $user]);
     }
 }
