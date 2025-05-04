@@ -11,8 +11,8 @@ use App\Http\Controllers\KategoriController;
 // Authentication Routes
 Auth::routes();
 
-// Main Homepage
-Route::get('/', [HomeController::class, 'index'])->name('home');
+// Main Homepage - Protected route, only accessible by authenticated users
+Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth');
 
 // Category Product Routes
 Route::prefix('category')->name('category.')->group(function () {
@@ -27,11 +27,7 @@ Route::prefix('user')->name('user.')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('index');
     Route::get('tambah', [UserController::class, 'tambah'])->name('tambah');
     Route::post('tambah_simpan', [UserController::class, 'tambah_simpan'])->name('tambah.simpan');
-
-    // Dynamic Parameter Route
     Route::get('{id}/name/{name}', [UserController::class, 'show'])->name('profile');
-
-    // User Modification Routes
     Route::prefix('{id}')->group(function () {
         Route::get('ubah', [UserController::class, 'ubah'])->name('ubah');
         Route::put('ubah_simpan', [UserController::class, 'ubah_simpan'])->name('ubah.simpan');
@@ -43,12 +39,9 @@ Route::prefix('user')->name('user.')->group(function () {
 Route::get('penjualan', [TransactionController::class, 'index'])->name('transaksi');
 
 // System Management Routes
-Route::prefix('system')->group(function () {
+Route::prefix('system')->name('system.')->group(function () {
     Route::get('level', [LevelController::class, 'index'])->name('level');
-    Route::get('kategori', [KategoriController::class, 'index'])->name('kategori');
 });
 
-// Kategori Route - Jobsheet 5
-Route::get('/kategori', [KategoriController::class, 'index']);
-Route::get('/kategori/create', [KategoriController::class, 'create']);
-Route::post('/kategori', [KategoriController::class, 'store']);
+// Kategori Routes (Menggunakan Route::resource untuk menyederhanakan rute)
+Route::resource('kategori', KategoriController::class)->except(['show']);

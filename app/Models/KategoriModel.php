@@ -12,8 +12,16 @@ class KategoriModel extends Model
 
     protected $fillable = ['kategori_kode', 'kategori_nama'];
 
+    // Timestamps default Laravel (updated_at, created_at)
+    public $timestamps = true;
+
+    /**
+     * Relasi ke model Barang
+     * Setiap kategori memiliki banyak barang
+     */
     public function barang(): HasMany
     {
-        return $this->hasMany(BarangModel::class, 'barang_id', 'kategori_id');
+        // Parameter: model relasi, foreign key di model relasi, local key di model ini
+        return $this->hasMany(BarangModel::class, 'kategori_id', 'kategori_id');
     }
 }

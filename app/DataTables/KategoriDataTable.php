@@ -8,26 +8,29 @@ use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class KategoriDataTable extends DataTable
 {
     /**
-     * Build the DataTable class.
-     *
-     * @param QueryBuilder $query Results from query() method.
+     * Method untuk mengolah data dan menambahkan kolom action
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            /*             ->addColumn('action', 'kategori.action') */
-            ->setRowId('id');
+            ->addColumn('action', function ($kategori) {
+                return view('kategori.action', compact('kategori'));
+            })
+            ->rawColumns(['action'])
+            ->setRowId('kategori_id')
+            ->setRowAttr([
+                'style' => 'background-color: white !important; cursor: default;',
+                'class' => 'no-hover'
+            ]);
     }
 
     /**
-     * Get the query source of dataTable.
+     * Method untuk meng-query data Kategori
      */
     public function query(KategoriModel $model): QueryBuilder
     {
@@ -35,7 +38,7 @@ class KategoriDataTable extends DataTable
     }
 
     /**
-     * Optional method if you want to use the html builder.
+     * Menentukan pengaturan tabel
      */
     public function html(): HtmlBuilder
     {
@@ -43,9 +46,28 @@ class KategoriDataTable extends DataTable
             ->setTableId('kategori-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            //->dom('Bfrtip')
             ->orderBy(1)
-            ->selectStyleSingle()
+            ->parameters([
+                'select' => [
+                    'style' => 'os',
+                    'selector' => 'td:not(:last-child)', // Mencegah seleksi di kolom aksi
+                    'className' => '', // Menghapus class selected
+                ],
+                'rowCallback' => "function(row, data) {
+                    $(row).removeClass('selected');
+                    $(row).css('background-color', 'white');
+                }",
+                'drawCallback' => "function() {
+                    $('#kategori-table tbody tr').removeClass('selected');
+                    $('#kategori-table tbody tr').css('background-color', 'white');
+                }",
+                'preDrawCallback' => "function() {
+                    $('#kategori-table tbody tr').removeClass('selected');
+                }",
+                'stripeClasses' => [], // Menghapus striping
+                'hover' => false, // Menonaktifkan hover
+            ])
+            ->dom('Bfrtip')
             ->buttons([
                 Button::make('excel'),
                 Button::make('csv'),
@@ -57,26 +79,25 @@ class KategoriDataTable extends DataTable
     }
 
     /**
-     * Get the dataTable columns definition.
+     * Mendefinisikan kolom yang ada di DataTable
      */
     public function getColumns(): array
     {
         return [
-            /*         Column::computed('action')
-                          ->exportable(false)
-                          ->printable(false)
-                          ->width(60)
-                          ->addClass('text-center'), */
-            Column::make('kategori_id'),
-            Column::make('kategori_kode'),
-            Column::make('kategori_nama'),
-            Column::make('created_at'),
-            Column::make('updated_at'),
+            Column::make('kategori_id')->title('ID'),
+            Column::make('kategori_kode')->title('Kode Kategori'),
+            Column::make('kategori_nama')->title('Nama Kategori'),
+            Column::computed('action')
+                ->title('Aksi')
+                ->exportable(false)
+                ->printable(false)
+                ->width(120)
+                ->addClass('text-center')
         ];
     }
 
     /**
-     * Get the filename for export.
+     * Mendefinisikan nama file untuk export
      */
     protected function filename(): string
     {

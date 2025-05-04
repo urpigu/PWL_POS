@@ -1,20 +1,20 @@
 @extends('layouts.app')
 
-{{-- Customize layout sections --}}
-@section('subtitle', 'Kategori')
+@section('subtitle', 'Edit Kategori')
 @section('content_header_title', 'Kategori')
-@section('content_header_subtitle', 'Create')
+@section('content_header_subtitle', 'Edit')
 
-{{-- Content body: main page content --}}
 @section('content_body')
     <div class="container">
         <div class="card card-primary">
             <div class="card-header">
-                <h3 class="card-title">Buat kategori baru</h3>
+                <h3 class="card-title">Edit Kategori</h3>
             </div>
 
-            <form method="POST" action="{{ route('kategori.store') }}">
+            <form action="{{ route('kategori.update', $kategori->kategori_id) }}" method="POST">
                 @csrf
+                @method('PUT')
+
                 <div class="card-body">
                     @if ($errors->any())
                         <div class="alert alert-danger">
@@ -29,8 +29,9 @@
                     <div class="form-group">
                         <label for="kodeKategori">Kode Kategori</label>
                         <input type="text" class="form-control @error('kodeKategori') is-invalid @enderror"
-                            id="kodeKategori" name="kodeKategori" value="{{ old('kodeKategori') }}"
-                            placeholder="Masukkan kode kategori" required>
+                            id="kodeKategori" name="kodeKategori"
+                            value="{{ old('kodeKategori', $kategori->kategori_kode) }}" placeholder="Masukkan Kode Kategori"
+                            required>
                         @error('kodeKategori')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -39,8 +40,9 @@
                     <div class="form-group">
                         <label for="namaKategori">Nama Kategori</label>
                         <input type="text" class="form-control @error('namaKategori') is-invalid @enderror"
-                            id="namaKategori" name="namaKategori" value="{{ old('namaKategori') }}"
-                            placeholder="Masukkan nama kategori" required>
+                            id="namaKategori" name="namaKategori"
+                            value="{{ old('namaKategori', $kategori->kategori_nama) }}" placeholder="Masukkan Nama Kategori"
+                            required>
                         @error('namaKategori')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -48,7 +50,7 @@
                 </div>
 
                 <div class="card-footer">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
                     <a href="{{ route('kategori.index') }}" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
