@@ -9,28 +9,45 @@ use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
+use Illuminate\Support\Facades\Log;
 
 class KategoriDataTable extends DataTable
 {
     /**
-     * Method untuk mengolah data dan menambahkan kolom action
+     * Build DataTable class.
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($kategori) {
-                return view('kategori.action', compact('kategori'));
+                return '<div class="action-btn-container">
+                    <a href="' . route('kategori.edit', $kategori->kategori_id) . '" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form action="' . route('kategori.destroy', $kategori->kategori_id) . '" method="POST" class="d-inline">
+                        ' . csrf_field() . '
+                        ' . method_field('DELETE') . '
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'Apakah Anda yakin ingin menghapus?\')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>';
+            })
+            ->editColumn('kategori_id', function ($kategori) {
+                return $kategori->kategori_id;
+            })
+            ->editColumn('kategori_kode', function ($kategori) {
+                return $kategori->kategori_kode;
+            })
+            ->editColumn('kategori_nama', function ($kategori) {
+                return $kategori->kategori_nama;
             })
             ->rawColumns(['action'])
-            ->setRowId('kategori_id')
-            ->setRowAttr([
-                'style' => 'background-color: white !important; cursor: default;',
-                'class' => 'no-hover'
-            ]);
+            ->setRowId('kategori_id');
     }
 
     /**
-     * Method untuk meng-query data Kategori
+     * Get query source of dataTable.
      */
     public function query(KategoriModel $model): QueryBuilder
     {
@@ -38,7 +55,7 @@ class KategoriDataTable extends DataTable
     }
 
     /**
-     * Menentukan pengaturan tabel
+     * Optional method if you want to use html builder.
      */
     public function html(): HtmlBuilder
     {
@@ -46,28 +63,9 @@ class KategoriDataTable extends DataTable
             ->setTableId('kategori-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->orderBy(1)
-            ->parameters([
-                'select' => [
-                    'style' => 'os',
-                    'selector' => 'td:not(:last-child)', // Mencegah seleksi di kolom aksi
-                    'className' => '', // Menghapus class selected
-                ],
-                'rowCallback' => "function(row, data) {
-                    $(row).removeClass('selected');
-                    $(row).css('background-color', 'white');
-                }",
-                'drawCallback' => "function() {
-                    $('#kategori-table tbody tr').removeClass('selected');
-                    $('#kategori-table tbody tr').css('background-color', 'white');
-                }",
-                'preDrawCallback' => "function() {
-                    $('#kategori-table tbody tr').removeClass('selected');
-                }",
-                'stripeClasses' => [], // Menghapus striping
-                'hover' => false, // Menonaktifkan hover
-            ])
             ->dom('Bfrtip')
+            ->orderBy(0)
+            ->selectStyleSingle()
             ->buttons([
                 Button::make('excel'),
                 Button::make('csv'),
@@ -79,25 +77,25 @@ class KategoriDataTable extends DataTable
     }
 
     /**
-     * Mendefinisikan kolom yang ada di DataTable
+     * Get columns.
      */
-    public function getColumns(): array
+    protected function getColumns(): array
     {
         return [
             Column::make('kategori_id')->title('ID'),
-            Column::make('kategori_kode')->title('Kode Kategori'),
-            Column::make('kategori_nama')->title('Nama Kategori'),
+            Column::make('kategori_kode')->title('KODE KATEGORI'),
+            Column::make('kategori_nama')->title('NAMA KATEGORI'),
             Column::computed('action')
-                ->title('Aksi')
                 ->exportable(false)
                 ->printable(false)
-                ->width(120)
+                ->width(60)
                 ->addClass('text-center')
+                ->title('AKSI'),
         ];
     }
 
     /**
-     * Mendefinisikan nama file untuk export
+     * Get filename for export.
      */
     protected function filename(): string
     {
