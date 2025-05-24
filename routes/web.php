@@ -110,6 +110,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/create_ajax', [BarangController::class, 'create_ajax']);
             Route::post('/ajax', [BarangController::class, 'store_ajax']);
 
+            Route::get('/import', [BarangController::class, 'import']);
+            Route::post('/import_ajax', [BarangController::class, 'import_ajax']);
+
             Route::get('/{id}', [BarangController::class, 'show']);
             Route::get('/{id}/edit', [BarangController::class, 'edit']);
             Route::put('/{id}', [BarangController::class, 'update']);
