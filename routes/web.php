@@ -114,6 +114,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/import_ajax', [BarangController::class, 'import_ajax']);
 
             Route::get('/export_excel',[BarangController::class, 'export_excel']);
+            Route::get('/export_pdf',[BarangController::class, 'export_pdf']);
 
             Route::get('/{id}', [BarangController::class, 'show']);
             Route::get('/{id}/edit', [BarangController::class, 'edit']);
