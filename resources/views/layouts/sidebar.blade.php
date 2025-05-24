@@ -86,3 +86,10 @@
         </ul>
     </nav>
 </div>
+
+<script>
+    document.getElementById('logout').addEventListener('click', function (e) {
+        e.preventDefault(); // Biar gak lompat ke #
+        document.getElementById('logout-form').submit(); // Trigger submit form logout
+    });
+</script>
