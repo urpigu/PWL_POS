@@ -2,7 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\LevelController;
+use App\Http\Controllers\Api\BarangController;
+use App\Http\Controllers\Api\KategoriController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +28,26 @@ Route::post('levels', [LevelController:: class, 'store' ]);
 Route::get('levels/{level}', [LevelController:: class, 'show' ]);
 Route::put('levels/{level}', [LevelController::class, 'update' ]);
 Route::delete('levels/{level}', [LevelController:: class, 'destroy']);
+
+Route::get('users', [UserController::class, 'index']);
+Route::post('users', [UserController::class, 'store']);
+Route::get('users/{id}', [UserController::class, 'show']);
+Route::put('users/{id}', [UserController::class, 'update']);
+Route::delete('users/{id}', [UserController::class, 'destroy']);
+
+
+Route::get('kategoris', [KategoriController::class, 'index']);
+Route::post('kategoris', [KategoriController::class, 'store']);
+Route::get('kategoris/{id}', [KategoriController::class, 'show']);
+Route::put('kategoris/{id}', [KategoriController::class, 'update']);
+Route::delete('kategoris/{id}', [KategoriController::class, 'destroy']);
+
+
+Route::get('barangs', [BarangController::class, 'index']);
+Route::post('barangs', [BarangController::class, 'store']);
+Route::get('barangs/{id}', [BarangController::class, 'show']);
+Route::put('barangs/{id}', [BarangController::class, 'update']);
+Route::delete('barangs/{id}', [BarangController::class, 'destroy']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
