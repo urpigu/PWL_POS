@@ -4,105 +4,114 @@
     <div class="card card-outline card-primary">
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
-            <a class="btn btn-sm btn-primary mt-1" href="{{ url('user/create') }}">Tambah</a>
-            <button onclick="modalAction('{{ url('user/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah
-                Ajax</button>
+            <div class="card-tools">
+                <a class="btn btn-sm btn-primary mt-1" href="{{ url('user/create') }}">Tambah</a>
+                <button onclick="modalAction('{{ url('user/create_ajax') }}')" class="btn btn-sm btn-success mt-1">
+                    Tambah Ajax
+                </button>
+            </div>
         </div>
-        <div class="card-body">
-            @if (session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-            @if (session('error'))
-                <div class="alert alert-danger">{{ session('error') }}</div>
-            @endif
-
-            <!-- Filter by level -->
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group row">
-                        <label class="col-form-label col-form-label">Filter:</label>
-                        <div class="col-3">
-                            <select class="form-control" id="level_id" name="level_id" required>
-                                <option value="">-- Pilih --</option>
-                                @foreach ($level as $item)
-                                    <option value="{{ $item->level_id }}">{{ $item->level_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+    <div class="card-body">
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row">
+                    <label class="col-1 control-label col-form-label">Filter:</label>
+                    <div class="col-3">
+                        <select name="level_id" id="level_id" class="form-control" required>
+                            <option value="">- Semua -</option>
+                            @foreach ($level as $item)
+                                <option value="{{ $item->level_id }}">{{ $item->level_nama }}</option>
+                            @endforeach
+                        </select>
+                        <small class="form-text text-muted">Level Pengguna</small>
                     </div>
                 </div>
             </div>
-
-            <!-- DataTable -->
-            <table id="userTable" class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Username</th>
-                        <th>Nama</th>
-                        <th>Level</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-            </table>
         </div>
-
-        <!-- Modal -->
-        <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
-            data-keyboard="false" data-width="75%" aria-hidden="true"></div>
+        <table class="table table-bordered table-striped table-hover table-sm"
+        id="table_user">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Nama</th>
+                    <th>Level Pengguna</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+        </table>
     </div>
+</div>
+<div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" 
+    data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true">
+</div>
 @endsection
+
+@push('css')
+@endpush
 
 @push('js')
     <script>
+        function modalAction(url = '') {
+            $('#myModal').load(url, function() {
+                $('#myModal').modal('show');
+            });
+        }
         $(document).ready(function() {
-            // Initialize DataTable
-            var table = $('#userTable').DataTable({
-                processing: true,
+            var dataUser = $('#table_user').DataTable({
+                // serverSide: true, jika ingin menggunakan server side processing
                 serverSide: true,
                 ajax: {
-                    url: '{{ route('user.list') }}', // URL untuk mengambil data pengguna
-                    data: function(d) {
-                        // Menambahkan parameter filter level_id untuk dikirimkan ke server
+                    "url": "{{ url('user/list') }}",
+                    "dataType": "json",
+                    "type": "POST",
+                    "data": function(d) {
                         d.level_id = $('#level_id').val();
                     }
                 },
-                columns: [{
-                        data: 'DT_RowIndex', // Kolom nomor urut
-                        name: 'DT_RowIndex'
-                    },
+                columns: [
                     {
-                        data: 'username', // Kolom username
-                        name: 'username'
-                    },
-                    {
-                        data: 'nama', // Kolom nama
-                        name: 'nama'
-                    },
-                    {
-                        data: 'level.name', // Kolom level yang merujuk ke level_name
-                        name: 'level.name'
-                    },
-                    {
-                        data: 'aksi', // Kolom aksi untuk tombol edit dan hapus
-                        name: 'aksi',
+                        // nomor urut dari laravel datatable addIndexColumn()
+                        data: "DT_RowIndex",
+                        className: "text-center",
+                        orderable: false,
+                        searchable: false
+                    },{
+                        data: "username",
+                        className: "",
+                        // orderable: true, jika ingin kolom ini bisa diurutkan
+                        orderable: true,
+                        // searchable: true, jika ingin kolom ini bisa dicari
+                        searchable: true
+                    },{
+                        data: "nama",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },{
+                        // mengambil data level hasil dari ORM berelasi
+                        data: "level.level_nama",
+                        className: "",
+                        orderable: false,
+                        searchable: false
+                    },{
+                        data: "aksi",
+                        className: "",
                         orderable: false,
                         searchable: false
                     }
                 ]
             });
 
-            // Event handler untuk perubahan pada filter level_id
-            $('#level_id').change(function() {
-                table.draw(); // Memuat ulang data pada DataTable saat filter berubah
+            $('#level_id').on('change', function() {
+                dataUser.ajax.reload();
             });
         });
-
-        // Function to open modal for adding new user via AJAX
-        function modalAction(url = '') {
-            $('#myModal').load(url, function() {
-                $('#myModal').modal('show'); // Menampilkan modal setelah konten dimuat
-            });
-        }
     </script>
 @endpush
